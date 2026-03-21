@@ -1,4 +1,4 @@
-require('dotenv').config(); // Corectat cu 'r' mic
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const Groq = require('groq-sdk');
@@ -82,6 +82,105 @@ function createTicket(problem, sessionId) {
   const contact = getContact(problem);
   const ticket = {
     id: `TICKET-${String(ticketCounter++).padStart(4, '0')}`,
+    problem,
+    sessionId,
+    status: 'open',
+    assignedTo: contact.name,
+    contact: contact.contact,
+    createdAt: new Date().toISOString()
+  };
+  tickets.push(ticket);
+  fs.writeFileSync('tickets.json', JSON.stringify(tickets, null, 2));
+  return ticket;
+}
+
+// 🌐 RUTA 1: Rularea de cod (Sandbox Piston)
+app.post('/run-code', async (req, res) => {
+  const { code, language } = req.body;
+  try {
+    const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: language, version: '*', files: [{ content: code }] })
+    });
+    const data = await response.json();
+    res.json({ output: data.run?.output || 'Fără output', error: data.run?.stderr });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// 🌐 RUTA 2: Chatbot-ul Principal (Dual Engine)
+app.post('/chat', async (req, res) => {
+  const { message, sessionId } = req.body;
+
+  if (!histories[sessionId]) {
+    histories[sessionId] = [{ role: "system", content: systemPrompt }];
+  }
+
+  // 1. Verificare Bază de Cunoștințe Rapidă
+  const kb = searchKnowledge(message);
+  if (kb) {
+    return res.json({
+      reply: `✅ **Soluție rapidă găsită:**\n\n🔍 **Problemă:** ${kb.problem}\n🔧 **Soluție:** ${kb.solution}`,
+      engine: 'knowledge-base'
+    });
+  }
+
+  histories[sessionId].push({ role: "user", content: message });
+  let finalReply = "";
+  let usedEngine = "";
+
+  try {
+    // 2. Încercare cu Groq (Mai rapid)
+    const result = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: histories[sessionId],
+      max_tokens: 1000
+    });
+    finalReply = result.choices[0].message.content;
+    usedEngine = 'groq';
+
+  } catch(e) {
+    console.log(`⚠️ Groq indisponibil (${e.message}). Trec pe Gemini...`);
+    
+    try {
+        // 3. Fallback pe Gemini dacă Groq pică
+        const geminiHistory = histories[sessionId]
+            .filter(msg => msg.role !== "system" && msg.role !== "user")
+            .map(msg => ({ role: "model", parts: [{ text: msg.content }] }));
+            
+        const chat = geminiModel.startChat({ history: geminiHistory });
+        const result = await chat.sendMessage(message);
+        finalReply = result.response.text();
+        usedEngine = 'gemini';
+        
+    } catch (geminiErr) {
+        return res.status(500).json({ reply: "❌ Ambele servere AI sunt momentan indisponibile." });
+    }
+  }
+
+  // Salvare răspuns în istoric
+  histories[sessionId].push({ role: "assistant", content: finalReply });
+
+  // 4. Verificare sistem de Tichete (Escaladare)
+  let ticketData = null;
+  if (finalReply.includes('ESCALADARE_NECESARA')) {
+    ticketData = createTicket(message, sessionId);
+    finalReply = `⚠️ **Această problemă necesită un specialist uman.**\n\n📋 **Ticket creat automat:**\n- **ID:** ${ticketData.id}\n- **Echipă:** ${ticketData.assignedTo}\n- **Status:** Deschis\n\nTe vom contacta în curând.`;
+  }
+
+  res.json({ reply: finalReply, engine: usedEngine, ticket: ticketData });
+});
+
+// 🌐 RUTA 3: Vizualizare Tichete
+app.get('/tickets', (req, res) => res.json(tickets));
+
+// 🚀 Pornire Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🤖 Agent AI pornit la port ${PORT}`);
+});
     problem,
     sessionId,
     status: 'open',
