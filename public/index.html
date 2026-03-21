@@ -310,4 +310,133 @@
     function formatText(text) {
         if (!text) return '';
         // Construim regex-ul dinamic pentru a nu strica parsarea Markdown
-        const codeBlockRegex = new Re
+        const codeBlockRegex = new RegExp(T3 + '([\\s\\S]*?)' + T3, 'g');
+        return text
+            .replace(codeBlockRegex, '<pre><code>$1</code></pre>') // Code blocks
+            .replace(/`([^`]+)`/g, '<code>$1</code>') // Inline code
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+            .replace(/\n/g, '<br>'); // Newlines
+    }
+
+    function scrollToBottom() {
+        const chat = document.getElementById('chat');
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function runCode() {
+        const code = document.getElementById('code-editor').value.trim();
+        const language = document.getElementById('code-lang').value;
+        const output = document.getElementById('code-output');
+        
+        if (!code) {
+             output.textContent = '⚠️ Te rugăm să scrii un cod înainte de a apăsa Run.';
+             return;
+        }
+        
+        output.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Se execută în Sandbox...';
+        
+        try {
+            const res = await fetch('/run-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language })
+            });
+            const data = await res.json();
+            
+            if (data.error) {
+                output.innerHTML = `<span style="color:#fca5a5;">❌ EROARE COMPILARE/RULARE:</span>\n${data.error}`;
+            } else {
+                output.innerHTML = `<span style="color:#86efac;">✅ EXECUȚIE CU SUCCES:</span>\n\n${data.output || 'Programul s-a încheiat fără output.'}`;
+            }
+        } catch(e) {
+            output.textContent = '❌ Eroare de rețea la contactarea Piston API.';
+        }
+    }
+
+    async function generateCode() {
+        const prompt = document.getElementById('code-prompt').value.trim();
+        if (!prompt) return;
+        
+        const editor = document.getElementById('code-editor');
+        const lang = document.getElementById('code-lang').value;
+        editor.value = '// AI-ul generează codul. Te rog așteaptă...';
+        
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: `Scrie DOAR codul sursă în limbajul ${lang} pentru următoarea cerință: "${prompt}". Nu adăuga explicații text, doar comentarii în interiorul codului. Folosește formatul Markdown pentru cod.`, 
+                    sessionId: 'code-gen-' + sessionId 
+                })
+            });
+            const data = await res.json();
+            
+            let rawCode = data.reply;
+            
+            // Regex inteligent și sigur
+            const extractRegex = new RegExp(T3 + '(?:\\w+)?\\n([\\s\\S]*?)' + T3);
+            const codeMatch = rawCode.match(extractRegex);
+            
+            if(codeMatch) {
+                editor.value = codeMatch[1];
+            } else {
+                editor.value = rawCode; // Fallback
+            }
+            
+            document.getElementById('code-output').textContent = `// Cod generat cu succes folosind motorul: ${data.engine}`;
+        } catch(e) {
+            editor.value = '// Eroare la generarea codului.';
+        }
+    }
+
+    async function analyzeCode() {
+        const code = document.getElementById('code-editor').value.trim();
+        if (!code) return;
+        
+        const output = document.getElementById('code-output');
+        output.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-beat"></i> AI analizează codul...';
+        
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: `Fii un reviewer de cod strict. Analizează următorul cod, identifică potențiale bug-uri, probleme de securitate sau optimizări și explică-le pe scurt:\n\n${T3}\n${code}\n${T3}`, 
+                    sessionId: 'analyze-' + sessionId 
+                })
+            });
+            const data = await res.json();
+            
+            output.innerHTML = `<span style="color:#93c5fd;"><i class="fa-solid fa-robot"></i> Analiză AI (Motor: ${data.engine}):</span>\n\n${formatTextForTerminal(data.reply)}`;
+        } catch(e) {
+            output.textContent = '❌ Eroare la analiza codului.';
+        }
+    }
+    
+    function formatTextForTerminal(text) {
+         const codeBlockRegex = new RegExp(T3 + '([\\s\\S]*?)' + T3, 'g');
+         return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(codeBlockRegex, '\n$1\n');
+    }
+
+    function copyOutput() {
+        const text = document.getElementById('code-output').innerText;
+        navigator.clipboard.writeText(text);
+        
+        const btn = document.querySelector('.pane-header button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiat';
+        setTimeout(() => btn.innerHTML = originalText, 2000);
+    }
+
+    // Auto-resize pentru textarea din chat
+    const msgArea = document.getElementById("msg");
+    msgArea.addEventListener("input", function() {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    });
+</script>
+</body>
+</html>
+
+
