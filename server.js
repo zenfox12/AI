@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const Groq = require('groq-sdk');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 app.use(express.json());
@@ -10,7 +10,7 @@ app.use(express.static('public'));
 
 // 🚀 Inițializare Motoare AI
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const systemPrompt = `Ești TechSupport AI, un agent specializat DOAR în suport tehnic.
 
