@@ -105,6 +105,25 @@ Răspunzi în limba utilizatorului.`
       max_tokens: 1000
     });
 
+    app.post('/run-code', async (req, res) => {
+  const { code, language } = req.body;
+  try {
+    const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: language,
+        version: '*',
+        files: [{ content: code }]
+      })
+    });
+    const data = await response.json();
+    res.json({ output: data.run?.output || 'Fără output', error: data.run?.stderr });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
     let reply = result.choices[0].message.content;
     histories[sessionId].push({ role: "assistant", content: reply });
 

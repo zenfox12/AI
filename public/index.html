@@ -59,8 +59,11 @@
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
         .code-btn { border-radius: 10px !important; width: auto !important; height: auto !important; padding: 8px 16px !important; font-size: 13px !important; }
+        .code-btn.green { background: #16a34a !important; }
+        .code-btn.green:hover { background: #15803d !important; }
         .code-input { width: 100%; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; }
         .code-input:focus { border-color: var(--primary); }
+        .lang-select { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; outline: none; cursor: pointer; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
     </style>
@@ -68,7 +71,7 @@
 <body>
 <div class="app-container">
     <header>
-        <h1><i class="fa-solid fa-robot"></i> FireBot AI Agent</h1>
+        <h1><i class="fa-solid fa-fire"></i> FireBot AI</h1>
         <div class="badges">
             <span class="badge groq"><i class="fa-solid fa-bolt"></i> Groq</span>
             <span class="badge kb"><i class="fa-solid fa-book"></i> KB</span>
@@ -85,8 +88,8 @@
     <div id="chat-view">
         <div id="chat">
             <div class="message ai">
-                <div class="engine-tag"><i class="fa-solid fa-microchip"></i> FireBot Agent</div>
-                Salut! Sunt agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
+                <div class="engine-tag"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
+                Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
                 Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
             </div>
         </div>
@@ -113,19 +116,32 @@
         <div style="display:flex; flex:1; overflow:hidden;">
             <!-- Editor stânga -->
             <div style="flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border);">
-                <div style="padding:10px 20px; background:var(--bg-main); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
-                    <span><i class="fa-solid fa-pen"></i> Editor — Lipește codul tău</span>
-                    <button class="code-btn" onclick="analyzeCode()"><i class="fa-solid fa-magnifying-glass"></i> Analizează</button>
+                <div style="padding:10px 20px; background:var(--bg-main); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span><i class="fa-solid fa-pen"></i> Editor</span>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <select id="code-lang" class="lang-select">
+                            <option value="python">🐍 Python</option>
+                            <option value="javascript">🟨 JavaScript</option>
+                            <option value="java">☕ Java</option>
+                            <option value="cpp">⚙️ C++</option>
+                            <option value="csharp">💜 C#</option>
+                            <option value="php">🐘 PHP</option>
+                            <option value="typescript">🔷 TypeScript</option>
+                            <option value="rust">🦀 Rust</option>
+                        </select>
+                        <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Rulează</button>
+                        <button class="code-btn" onclick="analyzeCode()"><i class="fa-solid fa-magnifying-glass"></i> Analizează</button>
+                    </div>
                 </div>
-                <textarea id="code-editor" placeholder="// Lipește codul tău aici..." style="flex:1; background:#0d1117; color:#e6edf3; border:none; padding:20px; font-family:'Courier New',monospace; font-size:14px; resize:none; outline:none; line-height:1.6;"></textarea>
+                <textarea id="code-editor" placeholder="// Lipește sau scrie codul tău aici..." style="flex:1; background:#0d1117; color:#e6edf3; border:none; padding:20px; font-family:'Courier New',monospace; font-size:14px; resize:none; outline:none; line-height:1.6;"></textarea>
             </div>
             <!-- Output dreapta -->
             <div style="flex:1; display:flex; flex-direction:column;">
                 <div style="padding:10px 20px; background:var(--bg-main); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
-                    <span><i class="fa-solid fa-robot"></i> Output AI</span>
+                    <span><i class="fa-solid fa-terminal"></i> Output</span>
                     <button class="code-btn" onclick="copyOutput()" style="background:var(--bg-surface-hover);"><i class="fa-solid fa-copy"></i> Copiază</button>
                 </div>
-                <div id="code-output" style="flex:1; background:#0d1117; padding:20px; overflow-y:auto; font-family:'Courier New',monospace; font-size:14px; line-height:1.6; color:#e6edf3; white-space:pre-wrap;">// Outputul AI va apărea aici...</div>
+                <div id="code-output" style="flex:1; background:#0d1117; padding:20px; overflow-y:auto; font-family:'Courier New',monospace; font-size:14px; line-height:1.6; color:#e6edf3; white-space:pre-wrap;">// Outputul va apărea aici...</div>
                 <div id="code-history" style="max-height:50px; overflow-x:auto; border-top:1px solid var(--border); padding:8px 16px; display:flex; gap:8px; align-items:center; white-space:nowrap;"></div>
             </div>
         </div>
@@ -255,6 +271,29 @@
             output.textContent = data.reply || 'Eroare';
             codeHistory.unshift({ prompt: 'Analiză cod', code: data.reply, time: new Date().toLocaleTimeString() });
             updateHistory();
+        } catch(e) {
+            output.textContent = '❌ Eroare: ' + e.message;
+        }
+    }
+
+    async function runCode() {
+        const code = document.getElementById('code-editor').value.trim();
+        const language = document.getElementById('code-lang').value;
+        if (!code) return;
+        const output = document.getElementById('code-output');
+        output.textContent = '⏳ Rulez codul...';
+        try {
+            const res = await fetch('/run-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language })
+            });
+            const data = await res.json();
+            if (data.error && data.error.length > 0) {
+                output.textContent = '❌ Eroare:\n' + data.error;
+            } else {
+                output.textContent = '✅ Output:\n' + (data.output || 'Fără output');
+            }
         } catch(e) {
             output.textContent = '❌ Eroare: ' + e.message;
         }
