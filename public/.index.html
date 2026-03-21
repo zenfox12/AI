@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FireBot AI - Agent Suport Tehnic</title>
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --groq-color: #60a5fa;
+            --gemini-color: #a78bfa;
+            --kb-color: #fb923c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; overflow: hidden;}
+        
+        .app-container { display: flex; flex-direction: column; width: 100%; max-width: 1400px; margin: 0 auto; height: 100%; }
+        
+        /* HEADER */
+        header { background: var(--bg-surface); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;}
+        header h1 { font-size: 20px; font-weight: 600; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;}
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap;}
+        .badge.groq { background: rgba(59,130,246,0.15); color: var(--groq-color); border: 1px solid rgba(59,130,246,0.3); }
+        .badge.gemini { background: rgba(167,139,250,0.15); color: var(--gemini-color); border: 1px solid rgba(167,139,250,0.3); }
+        .badge.kb { background: rgba(249,115,22,0.15); color: var(--kb-color); border: 1px solid rgba(249,115,22,0.3); }
+        
+        /* TABS */
+        .tabs { display: flex; background: var(--bg-main); padding: 12px 24px 0; gap: 8px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none;}
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { padding: 10px 16px; cursor: pointer; color: var(--text-muted); font-weight: 500; font-size: 14px; border-radius: 12px 12px 0 0; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { background: var(--bg-surface); color: var(--primary); border-bottom: 2px solid var(--primary);}
+
+        /* VIEWS CONTAINER */
+        .views-container { flex: 1; position: relative; overflow: hidden; background: var(--bg-surface); border-radius: 0 0 16px 16px;}
+        .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; overflow: hidden; }
+        .view.active { display: flex; }
+
+        /* CHAT VIEW */
+        #chat { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+        .message { max-width: 85%; padding: 14px 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease-out; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); word-wrap: break-word;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), #4f46e5); color: white; border-radius: 20px 20px 4px 20px; }
+        .ai { align-self: flex-start; background: var(--bg-surface-hover); border: 1px solid var(--border); border-radius: 20px 20px 20px 4px; }
+        .ai .engine-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 10px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .tag-groq { background: rgba(59,130,246,0.2); color: var(--groq-color); }
+        .tag-gemini { background: rgba(167,139,250,0.2); color: var(--gemini-color); }
+        .tag-kb { background: rgba(249,115,22,0.2); color: var(--kb-color); }
+        
+        pre { background: #0d1117; padding: 12px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 13px; border: 1px solid var(--border); }
+        code { font-family: 'Courier New', monospace; color: #79c0ff; }
+        
+        #input-area { background: var(--bg-surface); padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0;}
+        .input-wrapper { display: flex; gap: 10px; align-items: flex-end; background: var(--bg-main); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; transition: border-color 0.2s; }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        #msg { flex: 1; background: transparent; color: var(--text-main); border: none; padding: 10px 0; font-size: 15px; font-family: 'Inter', sans-serif; resize: none; min-height: 40px; max-height: 120px; }
+        #msg:focus { outline: none; }
+        .send-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;}
+        .send-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+
+        /* TICKETS VIEW */
+        #tickets-content { padding: 24px; overflow-y: auto; flex: 1; }
+        .ticket-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; transition: transform 0.2s; }
+        .ticket-item:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .ticket-item .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .ticket-item .tid { color: var(--gemini-color); font-weight: bold; font-family: monospace; font-size: 14px; }
+        .ticket-item .status { display: inline-block; background: rgba(239,68,68,0.15); color: #fca5a5; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; border: 1px solid rgba(239,68,68,0.3); }
+        
+        /* CODE VIEW */
+        .code-toolbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
+        .code-input { flex: 1; min-width: 200px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; }
+        .code-input:focus { border-color: var(--primary); }
+        .code-btn { border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; color: white; background: var(--primary); transition: background 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap;}
+        .code-btn:hover { background: var(--primary-hover); }
+        .code-btn.green { background: #16a34a; }
+        .code-btn.green:hover { background: #15803d; }
+        .code-btn.secondary { background: var(--bg-surface-hover); border: 1px solid var(--border); }
+        .code-btn.secondary:hover { background: var(--bg-main); }
+        
+        .editor-split { display: flex; flex: 1; overflow: hidden; flex-direction: row;}
+        .editor-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .editor-pane.left { border-right: 1px solid var(--border); }
+        
+        .pane-header { padding: 8px 16px; background: var(--bg-main); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);}
+        .pane-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
+        
+        .lang-select { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; cursor: pointer; }
+        
+        #code-editor { flex: 1; background: #0d1117; color: #e6edf3; border: none; padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; resize: none; outline: none; line-height: 1.5; }
+        #code-output { flex: 1; background: #0a0c10; padding: 16px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; color: #e6edf3; white-space: pre-wrap; }
+        
+        /* TYPING INDICATOR */
+        .typing { display: flex; gap: 4px; padding: 10px; }
+        .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.4s infinite both; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
+
+        /* --- RESPONSIVE DESIGN (Tablete & Mobile) --- */
+        @media (max-width: 768px) {
+            header { padding: 12px 16px; flex-direction: column; gap: 10px; align-items: flex-start;}
+            .badges { justify-content: flex-start; }
+            .tabs { padding: 10px 16px 0; }
+            #chat { padding: 16px; }
+            .message { max-width: 90%; font-size: 13px; }
+            #input-area { padding: 12px 16px; }
+            
+            /* Stivuire verticală pentru zona de cod pe mobile */
+            .editor-split { flex-direction: column; }
+            .editor-pane { flex: none; height: 50%; }
+            .editor-pane.left { border-right: none; border-bottom: 2px solid var(--primary); }
+            .pane-header { flex-direction: column; align-items: flex-start; gap: 10px;}
+            .pane-controls { width: 100%; justify-content: space-between;}
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <h1><i class="fa-solid fa-fire"></i> FireBot AI</h1>
+        <div class="badges">
+            <span class="badge groq"><i class="fa-solid fa-bolt"></i> Llama 3 (Groq)</span>
+            <span class="badge gemini"><i class="fa-solid fa-sparkles"></i> Gemini 1.5</span>
+            <span class="badge kb"><i class="fa-solid fa-book"></i> RAG Base</span>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Asistent</div>
+        <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete Suport</div>
+        <div class="tab" onclick="showTab('code', event)"><i class="fa-solid fa-laptop-code"></i> Sandbox Cod</div>
+    </div>
+
+    <div class="views-container">
+        <!-- CHAT VIEW -->
+        <div id="chat-view" class="view active">
+            <div id="chat">
+                <div class="message ai">
+                    <div class="engine-tag tag-gemini"><i class="fa-solid fa-fire"></i> Sistem Inițializat</div>
+                    Salut! Sunt FireBot, agentul tău de suport tehnic.<br><br>
+                    Sistemul utilizează o arhitectură <strong>Dual-Engine (Groq + Gemini)</strong> cu <strong>Knowledge Base</strong> integrat.<br><br>
+                    Descrie problema ta tehnică (cod, rețea, erori) și o voi rezolva pas cu pas. Dacă necesită escaladare umană, voi genera un ticket.
+                </div>
+            </div>
+            <div id="input-area">
+                <div class="input-wrapper">
+                    <textarea id="msg" placeholder="Ex: Primesc eroarea 'npm not found'..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                    <button class="send-btn" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TICKETS VIEW -->
+        <div id="tickets-view" class="view">
+            <div id="tickets-content">
+                <h2 style="margin-bottom:20px; color:var(--gemini-color); font-size:18px;"><i class="fa-solid fa-layer-group"></i> Tickete Active</h2>
+                <div id="tickets-list"></div>
+            </div>
+        </div>
+
+        <!-- CODE VIEW -->
+        <div id="code-view" class="view">
+            <div class="code-toolbar">
+                <input id="code-prompt" class="code-input" type="text" placeholder="Ex: Scrie un script Python pentru un server simplu..." onkeydown="if(event.key==='Enter') generateCode()">
+                <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează (AI)</button>
+            </div>
+            <div class="editor-split">
+                <!-- Editor stânga/sus -->
+                <div class="editor-pane left">
+                    <div class="pane-header">
+                        <span><i class="fa-solid fa-pen"></i> Editor Cod</span>
+                        <div class="pane-controls">
+                            <select id="code-lang" class="lang-select">
+                                <option value="python">Python</option>
+                                <option value="javascript" selected>JavaScript</option>
+                                <option value="cpp">C++</option>
+                                <option value="php">PHP</option>
+                            </select>
+                            <button class="code-btn secondary" onclick="analyzeCode()"><i class="fa-solid fa-bug"></i> Debug AI</button>
+                            <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Run</button>
+                        </div>
+                    </div>
+                    <textarea id="code-editor" placeholder="// Scrie sau lipește codul tău aici pentru a-l testa într-un mediu izolat (Sandbox)..."></textarea>
+                </div>
+                <!-- Output dreapta/jos -->
+                <div class="editor-pane">
+                    <div class="pane-header">
+                        <span><i class="fa-solid fa-terminal"></i> Terminal Output</span>
+                        <button class="code-btn secondary" onclick="copyOutput()"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+                    <div id="code-output">// Aștept executarea sau generarea codului...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sessionId = Math.random().toString(36).substr(2, 9);
+    
+    // TRUC MAGIC: Evitam backtick-urile literale ca sa nu se taie randarea!
+    const T3 = '`' + '`' + '`';
+
+    function showTab(tabId, e) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(tabId + '-view').classList.add('active');
+
+        if (tabId === 'tickets') loadTickets();
+    }
+
+    async function loadTickets() {
+        const list = document.getElementById('tickets-list');
+        list.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:40px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Încărcare...</div>';
+        try {
+            const res = await fetch('/tickets');
+            const tickets = await res.json();
+            if (tickets.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:40px;"><i class="fa-solid fa-check-circle" style="font-size:32px;color:#4ade80;display:block;margin-bottom:12px;"></i>Niciun ticket în așteptare. Totul funcționează perfect!</div>';
+                return;
+            }
+            list.innerHTML = tickets.map(t => `
+                <div class="ticket-item">
+                    <div class="header-row">
+                        <span class="tid"><i class="fa-solid fa-hashtag"></i> ${t.id}</span>
+                        <span class="status"><i class="fa-solid fa-circle-exclamation"></i> Necesită Atenție</span>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:12px; margin-bottom:12px;"><i class="fa-regular fa-clock"></i> Creat la: ${new Date(t.createdAt).toLocaleString('ro-RO')}</p>
+                    <p style="font-size:14px; margin-bottom:12px;"><strong>Problemă:</strong> ${t.problem}</p>
+                    <p style="font-size:13px; color:var(--groq-color);"><i class="fa-solid fa-user-shield"></i> Rutat către: ${t.assignedTo} (${t.contact})</p>
+                </div>
+            `).join('');
+        } catch(e) {
+            list.innerHTML = '<div style="text-align:center; color:#fca5a5; margin-top:40px;">❌ Eroare la conectarea cu serverul.</div>';
+        }
+    }
+
+    async function send() {
+        const msgInput = document.getElementById('msg');
+        const msg = msgInput.value.trim();
+        if (!msg) return;
+        
+        addMessage(msg, 'user');
+        msgInput.value = '';
+        msgInput.style.height = 'auto';
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message ai typing';
+        typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        document.getElementById('chat').appendChild(typingDiv);
+        scrollToBottom();
+
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, sessionId })
+            });
+            const data = await res.json();
+            typingDiv.remove();
+            
+            if (data.error) {
+                 addMessage('❌ Eroare internă server: ' + data.error, 'ai', 'error');
+            } else {
+                 let engineType = data.engine;
+                 if (data.reply.includes('Soluție rapidă găsită')) engineType = 'knowledge-base';
+                 addMessage(data.reply, 'ai', engineType);
+            }
+        } catch(e) {
+            typingDiv.remove();
+            addMessage('❌ Nu s-a putut stabili conexiunea cu serverul AI.', 'ai', 'error');
+        }
+    }
+
+    function addMessage(text, type, engineType = '') {
+        const chat = document.getElementById('chat');
+        const div = document.createElement('div');
+        div.className = 'message ' + type;
+        
+        if (type === 'ai') {
+            let tagHtml = '';
+            if (engineType === 'knowledge-base') {
+                tagHtml = `<div class="engine-tag tag-kb"><i class="fa-solid fa-bolt-lightning"></i> Cache / Bază Cunoștințe</div>`;
+            } else if (engineType === 'gemini') {
+                tagHtml = `<div class="engine-tag tag-gemini"><i class="fa-solid fa-sparkles"></i> Fallback: Gemini 1.5 Flash</div>`;
+            } else if (engineType === 'groq') {
+                tagHtml = `<div class="engine-tag tag-groq"><i class="fa-solid fa-microchip"></i> Motor: Llama 3 (Groq)</div>`;
+            }
+            div.innerHTML = tagHtml + formatText(text);
+        } else {
+            div.textContent = text;
+        }
+        
+        chat.appendChild(div);
+        scrollToBottom();
+    }
+
+    function formatText(text) {
+        if (!text) return '';
+        // Construim regex-ul dinamic pentru a nu strica parsarea Markdown
+        const codeBlockRegex = new Re
