@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSupport AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+        .app-container { display: flex; flex-direction: column; width: 100%; max-width: 1200px; margin: 0 auto; height: 100%; }
+        header { background: var(--bg-surface); padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 20px; font-weight: 600; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        .badges { display: flex; gap: 8px; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .badge.groq { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+        .badge.kb { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+        .tabs { display: flex; background: var(--bg-main); padding: 16px 32px 0; gap: 12px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: var(--text-muted); font-weight: 500; border-radius: 20px 20px 0 0; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { background: var(--bg-surface); color: var(--primary); }
+        #chat-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-surface); border-radius: 0 0 16px 16px; }
+        #tickets-view { flex: 1; padding: 32px; overflow-y: auto; display: none; background: var(--bg-surface); border-radius: 0 0 16px 16px; }
+        #code-view { flex: 1; display: none; flex-direction: column; background: var(--bg-surface); border-radius: 0 0 16px 16px; overflow: hidden; }
+        #chat { flex: 1; overflow-y: auto; padding: 32px; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
+        .message { max-width: 75%; padding: 16px 20px; line-height: 1.6; font-size: 15px; animation: fadeIn 0.3s ease-out; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), #4f46e5); color: white; border-radius: 20px 20px 4px 20px; }
+        .ai { align-self: flex-start; background: var(--bg-surface-hover); border: 1px solid var(--border); border-radius: 20px 20px 20px 4px; }
+        .ai .engine-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #93c5fd; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 12px; margin-bottom: 12px; }
+        pre { background: #0d1117; padding: 16px; border-radius: 12px; overflow-x: auto; margin-top: 12px; font-size: 13px; border: 1px solid var(--border); }
+        code { font-family: 'Courier New', monospace; color: #79c0ff; }
+        #input-area { background: var(--bg-surface); padding: 24px 32px; border-top: 1px solid var(--border); }
+        .input-wrapper { display: flex; gap: 12px; align-items: flex-end; background: var(--bg-main); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; transition: border-color 0.2s; }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        #msg { flex: 1; background: transparent; color: var(--text-main); border: none; padding: 10px 0; font-size: 15px; font-family: 'Inter', sans-serif; resize: none; min-height: 44px; max-height: 150px; }
+        #msg:focus { outline: none; }
+        button { background: var(--primary); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        button:hover { background: var(--primary-hover); transform: scale(1.05); }
+        .ticket-item { background: var(--bg-surface-hover); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: transform 0.2s; }
+        .ticket-item:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .ticket-item .tid { color: #a78bfa; font-weight: bold; font-family: monospace; font-size: 15px; }
+        .ticket-item .status { display: inline-block; background: rgba(239,68,68,0.15); color: #fca5a5; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 12px; border: 1px solid rgba(239,68,68,0.3); }
+        .empty { text-align: center; color: var(--text-muted); margin-top: 60px; font-size: 16px; }
+        .typing { color: var(--text-muted); display: flex; gap: 4px; padding: 16px 20px; }
+        .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.4s infinite both; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
+        .code-btn { border-radius: 10px !important; width: auto !important; height: auto !important; padding: 8px 16px !important; font-size: 13px !important; }
+        .code-input { width: 100%; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; }
+        .code-input:focus { border-color: var(--primary); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <h1><i class="fa-solid fa-robot"></i> TechSupport AI Agent</h1>
+        <div class="badges">
+            <span class="badge groq"><i class="fa-solid fa-bolt"></i> Groq</span>
+            <span class="badge kb"><i class="fa-solid fa-book"></i> KB</span>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Chat</div>
+        <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete</div>
+        <div class="tab" onclick="showTab('code', event)"><i class="fa-solid fa-code"></i> Cod</div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat-view">
+        <div id="chat">
+            <div class="message ai">
+                <div class="engine-tag"><i class="fa-solid fa-microchip"></i> TechSupport Agent</div>
+                Salut! Sunt agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
+                Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
+            </div>
+        </div>
+        <div id="input-area">
+            <div class="input-wrapper">
+                <textarea id="msg" placeholder="Descrie problema ta tehnică..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                <button onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKETE -->
+    <div id="tickets-view">
+        <h2 style="margin-bottom:24px; color:#a78bfa; font-weight:600;"><i class="fa-solid fa-layer-group"></i> Tickete Deschise</h2>
+        <div id="tickets-list"></div>
+    </div>
+
+    <!-- COD -->
+    <div id="code-view">
+        <div style="padding:20px 24px; border-bottom:1px solid var(--border); display:flex; gap:12px; align-items:center;">
+            <input id="code-prompt" class="code-input" type="text" placeholder="Ex: scrie o funcție Python care sortează o listă..." onkeydown="if(event.key==='Enter') generateCode()">
+            <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează</button>
+        </div>
+        <div style="display:flex; flex:1; overflow:hidden;">
+            <!-- Editor stânga -->
+            <div style="flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border);">
+                <div style="padding:10px 20px; background:var(--bg-main); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-pen"></i> Editor — Lipește codul tău</span>
+                    <button class="code-btn" onclick="analyzeCode()"><i class="fa-solid fa-magnifying-glass"></i> Analizează</button>
+                </div>
+                <textarea id="code-editor" placeholder="// Lipește codul tău aici..." style="flex:1; background:#0d1117; color:#e6edf3; border:none; padding:20px; font-family:'Courier New',monospace; font-size:14px; resize:none; outline:none; line-height:1.6;"></textarea>
+            </div>
+            <!-- Output dreapta -->
+            <div style="flex:1; display:flex; flex-direction:column;">
+                <div style="padding:10px 20px; background:var(--bg-main); font-size:12px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-robot"></i> Output AI</span>
+                    <button class="code-btn" onclick="copyOutput()" style="background:var(--bg-surface-hover);"><i class="fa-solid fa-copy"></i> Copiază</button>
+                </div>
+                <div id="code-output" style="flex:1; background:#0d1117; padding:20px; overflow-y:auto; font-family:'Courier New',monospace; font-size:14px; line-height:1.6; color:#e6edf3; white-space:pre-wrap;">// Outputul AI va apărea aici...</div>
+                <div id="code-history" style="max-height:50px; overflow-x:auto; border-top:1px solid var(--border); padding:8px 16px; display:flex; gap:8px; align-items:center; white-space:nowrap;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sessionId = Math.random().toString(36).substr(2, 9);
+    const codeHistory = [];
+
+    function showTab(tab, e) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        document.getElementById('chat-view').style.display = 'none';
+        document.getElementById('tickets-view').style.display = 'none';
+        document.getElementById('code-view').style.display = 'none';
+        if (tab === 'chat') document.getElementById('chat-view').style.display = 'flex';
+        else if (tab === 'tickets') { document.getElementById('tickets-view').style.display = 'block'; loadTickets(); }
+        else if (tab === 'code') document.getElementById('code-view').style.display = 'flex';
+    }
+
+    async function loadTickets() {
+        try {
+            const res = await fetch('/tickets');
+            const tickets = await res.json();
+            const list = document.getElementById('tickets-list');
+            if (tickets.length === 0) {
+                list.innerHTML = '<div class="empty"><i class="fa-solid fa-check-circle" style="font-size:24px;color:#4ade80;display:block;margin-bottom:12px;"></i>Nu există tickete deschise!</div>';
+                return;
+            }
+            list.innerHTML = tickets.map(t => `
+                <div class="ticket-item">
+                    <span class="tid"><i class="fa-solid fa-hashtag"></i> ${t.id}</span>
+                    <span class="status"><i class="fa-solid fa-fire"></i> Deschis</span>
+                    <p style="margin-top:12px;color:var(--text-muted);font-size:13px"><i class="fa-regular fa-clock"></i> ${t.createdAt}</p>
+                    <p style="margin-top:8px">${t.problem}</p>
+                    <p style="margin-top:8px;color:#60a5fa"><i class="fa-solid fa-user"></i> ${t.assignedTo} — ${t.contact}</p>
+                </div>
+            `).join('');
+        } catch(e) {
+            document.getElementById('tickets-list').innerHTML = '<div class="empty">Nu s-au putut încărca ticketele.</div>';
+        }
+    }
+
+    async function send() {
+        const msgInput = document.getElementById('msg');
+        const msg = msgInput.value.trim();
+        if (!msg) return;
+        addMessage(msg, 'user');
+        msgInput.value = '';
+        msgInput.style.height = 'auto';
+        const typing = addMessage('', 'ai typing');
+        typing.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, sessionId })
+            });
+            const data = await res.json();
+            typing.remove();
+            if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
+            else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
+        } catch(e) {
+            typing.remove();
+            addMessage('❌ Eroare de conexiune.', 'ai', 'groq');
+        }
+    }
+
+    function addMessage(text, type, engine) {
+        const chat = document.getElementById('chat');
+        const div = document.createElement('div');
+        div.className = 'message ' + type;
+        if (type.includes('ai') && !type.includes('typing')) {
+            const icon = engine === 'knowledge-base' ? '<i class="fa-solid fa-book"></i>' : '<i class="fa-solid fa-bolt"></i>';
+            const label = engine === 'knowledge-base' ? 'Knowledge Base' : 'Groq Engine';
+            div.innerHTML = `<div class="engine-tag">${icon} ${label}</div>${formatText(text)}`;
+        } else if (!type.includes('typing')) {
+            div.textContent = text;
+        }
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        return div;
+    }
+
+    function formatText(text) {
+        if (!text) return '';
+        return text
+            .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
+    async function generateCode() {
+        const prompt = document.getElementById('code-prompt').value.trim();
+        if (!prompt) return;
+        const output = document.getElementById('code-output');
+        output.textContent = '⏳ Generez codul...';
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Scrie cod pentru: ${prompt}. Returnează DOAR codul cu comentarii scurte.`, sessionId: 'code-' + sessionId })
+            });
+            const data = await res.json();
+            output.textContent = data.reply || 'Eroare';
+            codeHistory.unshift({ prompt, code: data.reply, time: new Date().toLocaleTimeString() });
+            updateHistory();
+        } catch(e) {
+            output.textContent = '❌ Eroare: ' + e.message;
+        }
+    }
+
+    async function analyzeCode() {
+        const code = document.getElementById('code-editor').value.trim();
+        if (!code) return;
+        const output = document.getElementById('code-output');
+        output.textContent = '⏳ Analizez codul...';
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Analizează acest cod, găsește erori și sugerează îmbunătățiri:\n\n${code}`, sessionId: 'analyze-' + sessionId })
+            });
+            const data = await res.json();
+            output.textContent = data.reply || 'Eroare';
+            codeHistory.unshift({ prompt: 'Analiză cod', code: data.reply, time: new Date().toLocaleTimeString() });
+            updateHistory();
+        } catch(e) {
+            output.textContent = '❌ Eroare: ' + e.message;
+        }
+    }
+
+    function updateHistory() {
+        const hist = document.getElementById('code-history');
+        hist.innerHTML = codeHistory.slice(0, 5).map((h, i) => `
+            <span onclick="loadHistory(${i})" style="background:var(--bg-surface-hover);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text-muted);">
+                ${h.time} — ${h.prompt.substring(0, 15)}...
+            </span>
+        `).join('');
+    }
+
+    function loadHistory(i) {
+        document.getElementById('code-output').textContent = codeHistory[i].code;
+    }
+
+    function copyOutput() {
+        navigator.clipboard.writeText(document.getElementById('code-output').textContent);
+        alert('✅ Copiat!');
+    }
+
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+        tx[i].setAttribute("style", "height:" + tx[i].scrollHeight + "px;overflow-y:hidden;");
+        tx[i].addEventListener("input", function() {
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+        });
+    }
+</script>
+</body>
+</html>
