@@ -102,7 +102,7 @@ Răspunzi în limba utilizatorului.`
 
   try {
     const result = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       messages: histories[sessionId],
       max_tokens: 1000
     });
