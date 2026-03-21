@@ -17,6 +17,8 @@ const knowledgeBase = [
   { problem: "undefined is not a function", solution: "Verifică că funcția există și e importată corect." },
   { problem: "api key invalid", solution: "Verifică că cheia e în .env și că ai apelat require('dotenv').config()." },
   { problem: "syntax error", solution: "Verifică parantezele și ghilimelele în cod. Folosește VS Code pentru highlight." },
+  { problem: "sandbox", solution: "Sandbox-ul este un mediu izolat pentru rularea codului. Folosește tab-ul 'Cod' din FireBot AI pentru a rula cod în sandbox securizat!" },
+{ problem: "run code", solution: "Poți rula cod direct în tab-ul 'Cod' — selectează limbajul și apasă butonul verde 'Rulează'!" },
 ];
 
 const histories = {};
