@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FireBot AI - Agent Suport Tehnic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-main: #0f172a;
@@ -21,184 +21,159 @@
             --kb-color: #fb923c;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; overflow: hidden;}
-        
+        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; overflow: hidden; }
         .app-container { display: flex; flex-direction: column; width: 100%; max-width: 1400px; margin: 0 auto; height: 100%; }
-        
-        /* HEADER */
-        header { background: var(--bg-surface); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;}
+        header { background: var(--bg-surface); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         header h1 { font-size: 20px; font-weight: 600; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
-        .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;}
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap;}
+        .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .badge.groq { background: rgba(59,130,246,0.15); color: var(--groq-color); border: 1px solid rgba(59,130,246,0.3); }
-        .badge.gemini { background: rgba(167,139,250,0.15); color: var(--gemini-color); border: 1px solid rgba(167,139,250,0.3); }
         .badge.kb { background: rgba(249,115,22,0.15); color: var(--kb-color); border: 1px solid rgba(249,115,22,0.3); }
-        
-        /* TABS */
-        .tabs { display: flex; background: var(--bg-main); padding: 12px 24px 0; gap: 8px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none;}
+        .tabs { display: flex; background: var(--bg-main); padding: 12px 24px 0; gap: 8px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab { padding: 10px 16px; cursor: pointer; color: var(--text-muted); font-weight: 500; font-size: 14px; border-radius: 12px 12px 0 0; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .tab:hover { color: var(--text-main); }
-        .tab.active { background: var(--bg-surface); color: var(--primary); border-bottom: 2px solid var(--primary);}
-
-        /* VIEWS CONTAINER */
-        .views-container { flex: 1; position: relative; overflow: hidden; background: var(--bg-surface); border-radius: 0 0 16px 16px;}
+        .tab.active { background: var(--bg-surface); color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .views-container { flex: 1; position: relative; overflow: hidden; background: var(--bg-surface); border-radius: 0 0 16px 16px; }
         .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; overflow: hidden; }
         .view.active { display: flex; }
-
-        /* CHAT VIEW */
         #chat { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
-        .message { max-width: 85%; padding: 14px 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease-out; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); word-wrap: break-word;}
+        .message { max-width: 85%; padding: 14px 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease-out; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); word-wrap: break-word; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), #4f46e5); color: white; border-radius: 20px 20px 4px 20px; }
         .ai { align-self: flex-start; background: var(--bg-surface-hover); border: 1px solid var(--border); border-radius: 20px 20px 20px 4px; }
-        .ai .engine-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 10px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .ai .engine-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 10px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         .tag-groq { background: rgba(59,130,246,0.2); color: var(--groq-color); }
-        .tag-gemini { background: rgba(167,139,250,0.2); color: var(--gemini-color); }
         .tag-kb { background: rgba(249,115,22,0.2); color: var(--kb-color); }
-        
         pre { background: #0d1117; padding: 12px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 13px; border: 1px solid var(--border); }
         code { font-family: 'Courier New', monospace; color: #79c0ff; }
-        
-        #input-area { background: var(--bg-surface); padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0;}
+        #input-area { background: var(--bg-surface); padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0; }
         .input-wrapper { display: flex; gap: 10px; align-items: flex-end; background: var(--bg-main); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; transition: border-color 0.2s; }
         .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
         #msg { flex: 1; background: transparent; color: var(--text-main); border: none; padding: 10px 0; font-size: 15px; font-family: 'Inter', sans-serif; resize: none; min-height: 40px; max-height: 120px; }
         #msg:focus { outline: none; }
-        .send-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;}
+        .send-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
         .send-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
-
-        /* TICKETS VIEW */
         #tickets-content { padding: 24px; overflow-y: auto; flex: 1; }
         .ticket-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; transition: transform 0.2s; }
         .ticket-item:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-        .ticket-item .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .ticket-item .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .ticket-item .tid { color: var(--gemini-color); font-weight: bold; font-family: monospace; font-size: 14px; }
         .ticket-item .status { display: inline-block; background: rgba(239,68,68,0.15); color: #fca5a5; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; border: 1px solid rgba(239,68,68,0.3); }
-        
-        /* CODE VIEW */
-        .code-toolbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
-        .code-input { flex: 1; min-width: 200px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; }
+        .code-toolbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .code-input { flex: 1; min-width: 200px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; }
         .code-input:focus { border-color: var(--primary); }
-        .code-btn { border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; color: white; background: var(--primary); transition: background 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap;}
+        .code-btn { border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; color: white; background: var(--primary); transition: background 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .code-btn:hover { background: var(--primary-hover); }
         .code-btn.green { background: #16a34a; }
         .code-btn.green:hover { background: #15803d; }
-        .code-btn.secondary { background: var(--bg-surface-hover); border: 1px solid var(--border); }
+        .code-btn.secondary { background: var(--bg-surface-hover); border: 1px solid var(--border); color: var(--text-main); }
         .code-btn.secondary:hover { background: var(--bg-main); }
-        
-        .editor-split { display: flex; flex: 1; overflow: hidden; flex-direction: row;}
+        .editor-split { display: flex; flex: 1; overflow: hidden; }
         .editor-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .editor-pane.left { border-right: 1px solid var(--border); }
-        
-        .pane-header { padding: 8px 16px; background: var(--bg-main); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);}
-        .pane-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
-        
+        .pane-header { padding: 8px 16px; background: var(--bg-main); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .pane-controls { display: flex; gap: 8px; align-items: center; }
         .lang-select { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; cursor: pointer; }
-        
         #code-editor { flex: 1; background: #0d1117; color: #e6edf3; border: none; padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; resize: none; outline: none; line-height: 1.5; }
         #code-output { flex: 1; background: #0a0c10; padding: 16px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; color: #e6edf3; white-space: pre-wrap; }
-        
-        /* TYPING INDICATOR */
         .typing { display: flex; gap: 4px; padding: 10px; }
         .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.4s infinite both; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
-
-        /* --- RESPONSIVE DESIGN (Tablete & Mobile) --- */
+        #code-history { max-height: 44px; overflow-x: auto; border-top: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 8px; align-items: center; white-space: nowrap; }
         @media (max-width: 768px) {
-            header { padding: 12px 16px; flex-direction: column; gap: 10px; align-items: flex-start;}
+            header { padding: 12px 16px; flex-direction: column; gap: 10px; align-items: flex-start; }
             .badges { justify-content: flex-start; }
             .tabs { padding: 10px 16px 0; }
             #chat { padding: 16px; }
             .message { max-width: 90%; font-size: 13px; }
             #input-area { padding: 12px 16px; }
-            
-            /* Stivuire verticală pentru zona de cod pe mobile */
             .editor-split { flex-direction: column; }
             .editor-pane { flex: none; height: 50%; }
             .editor-pane.left { border-right: none; border-bottom: 2px solid var(--primary); }
-            .pane-header { flex-direction: column; align-items: flex-start; gap: 10px;}
-            .pane-controls { width: 100%; justify-content: space-between;}
+            .pane-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .pane-controls { width: 100%; justify-content: space-between; }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <header>
-        <h1><i class="fa-solid fa-fire"></i> FireBot AI</h1>
+        <h1><i class="fa-solid fa-fire" style="-webkit-text-fill-color:#f97316;"></i> FireBot AI</h1>
         <div class="badges">
-            <span class="badge groq"><i class="fa-solid fa-bolt"></i> Llama 3 (Groq)</span>
-            <span class="badge gemini"><i class="fa-solid fa-sparkles"></i> Gemini 1.5</span>
-            <span class="badge kb"><i class="fa-solid fa-book"></i> RAG Base</span>
+            <span class="badge groq"><i class="fa-solid fa-bolt"></i> Groq</span>
+            <span class="badge kb"><i class="fa-solid fa-book"></i> KB</span>
         </div>
     </header>
 
     <div class="tabs">
-        <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Asistent</div>
-        <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete Suport</div>
+        <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Chat</div>
+        <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete</div>
         <div class="tab" onclick="showTab('code', event)"><i class="fa-solid fa-laptop-code"></i> Sandbox Cod</div>
     </div>
 
     <div class="views-container">
-        <!-- CHAT VIEW -->
+        <!-- CHAT -->
         <div id="chat-view" class="view active">
             <div id="chat">
-               <div class="message ai">
-    <div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
-    Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
-    Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
-</div>
+                <div class="message ai">
+                    <div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
+                    Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
+                    Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
                 </div>
             </div>
             <div id="input-area">
                 <div class="input-wrapper">
-                    <textarea id="msg" placeholder="Ex: Primesc eroarea 'npm not found'..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                    <textarea id="msg" placeholder="Descrie problema ta tehnică..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
                     <button class="send-btn" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
 
-        <!-- TICKETS VIEW -->
+        <!-- TICKETE -->
         <div id="tickets-view" class="view">
             <div id="tickets-content">
-                <h2 style="margin-bottom:20px; color:var(--gemini-color); font-size:18px;"><i class="fa-solid fa-layer-group"></i> Tickete Active</h2>
+                <h2 style="margin-bottom:20px; color:#a78bfa; font-size:18px;"><i class="fa-solid fa-layer-group"></i> Tickete Active</h2>
                 <div id="tickets-list"></div>
             </div>
         </div>
 
-        <!-- CODE VIEW -->
+        <!-- COD -->
         <div id="code-view" class="view">
             <div class="code-toolbar">
-                <input id="code-prompt" class="code-input" type="text" placeholder="Ex: Scrie un script Python pentru un server simplu..." onkeydown="if(event.key==='Enter') generateCode()">
-                <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează (AI)</button>
+                <input id="code-prompt" class="code-input" type="text" placeholder="Ex: Scrie o funcție Python care sortează o listă..." onkeydown="if(event.key==='Enter') generateCode()">
+                <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează</button>
             </div>
             <div class="editor-split">
-                <!-- Editor stânga/sus -->
                 <div class="editor-pane left">
                     <div class="pane-header">
-                        <span><i class="fa-solid fa-pen"></i> Editor Cod</span>
+                        <span><i class="fa-solid fa-pen"></i> Editor</span>
                         <div class="pane-controls">
                             <select id="code-lang" class="lang-select">
-                                <option value="python">Python</option>
-                                <option value="javascript" selected>JavaScript</option>
-                                <option value="cpp">C++</option>
-                                <option value="php">PHP</option>
+                                <option value="python">🐍 Python</option>
+                                <option value="javascript">🟨 JavaScript</option>
+                                <option value="java">☕ Java</option>
+                                <option value="cpp">⚙️ C++</option>
+                                <option value="csharp">💜 C#</option>
+                                <option value="php">🐘 PHP</option>
+                                <option value="typescript">🔷 TypeScript</option>
+                                <option value="rust">🦀 Rust</option>
                             </select>
                             <button class="code-btn secondary" onclick="analyzeCode()"><i class="fa-solid fa-bug"></i> Debug AI</button>
-                            <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Run</button>
+                            <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Rulează</button>
                         </div>
                     </div>
-                    <textarea id="code-editor" placeholder="// Scrie sau lipește codul tău aici pentru a-l testa într-un mediu izolat (Sandbox)..."></textarea>
+                    <textarea id="code-editor" placeholder="// Lipește sau scrie codul tău aici..."></textarea>
                 </div>
-                <!-- Output dreapta/jos -->
                 <div class="editor-pane">
                     <div class="pane-header">
-                        <span><i class="fa-solid fa-terminal"></i> Terminal Output</span>
-                        <button class="code-btn secondary" onclick="copyOutput()"><i class="fa-regular fa-copy"></i> Copy</button>
+                        <span><i class="fa-solid fa-terminal"></i> Output</span>
+                        <button class="code-btn secondary" onclick="copyOutput()"><i class="fa-regular fa-copy"></i> Copiază</button>
                     </div>
-                    <div id="code-output">// Aștept executarea sau generarea codului...</div>
+                    <div id="code-output">// Outputul va apărea aici...</div>
+                    <div id="code-history"></div>
                 </div>
             </div>
         </div>
@@ -207,43 +182,40 @@
 
 <script>
     const sessionId = Math.random().toString(36).substr(2, 9);
-    
-    // TRUC MAGIC: Evitam backtick-urile literale ca sa nu se taie randarea!
-    const T3 = '`' + '`' + '`';
+    const codeHistory = [];
+    const T3 = '`'.repeat(3);
 
     function showTab(tabId, e) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(tabId + '-view').classList.add('active');
-
         if (tabId === 'tickets') loadTickets();
     }
 
     async function loadTickets() {
         const list = document.getElementById('tickets-list');
-        list.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:40px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Încărcare...</div>';
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);margin-top:40px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Încărcare...</div>';
         try {
             const res = await fetch('/tickets');
             const tickets = await res.json();
             if (tickets.length === 0) {
-                list.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:40px;"><i class="fa-solid fa-check-circle" style="font-size:32px;color:#4ade80;display:block;margin-bottom:12px;"></i>Niciun ticket în așteptare. Totul funcționează perfect!</div>';
+                list.innerHTML = '<div style="text-align:center;color:var(--text-muted);margin-top:40px;"><i class="fa-solid fa-check-circle" style="font-size:32px;color:#4ade80;display:block;margin-bottom:12px;"></i>Nu există tickete deschise!</div>';
                 return;
             }
             list.innerHTML = tickets.map(t => `
                 <div class="ticket-item">
                     <div class="header-row">
                         <span class="tid"><i class="fa-solid fa-hashtag"></i> ${t.id}</span>
-                        <span class="status"><i class="fa-solid fa-circle-exclamation"></i> Necesită Atenție</span>
+                        <span class="status"><i class="fa-solid fa-fire"></i> Deschis</span>
                     </div>
-                    <p style="color:var(--text-muted);font-size:12px; margin-bottom:12px;"><i class="fa-regular fa-clock"></i> Creat la: ${new Date(t.createdAt).toLocaleString('ro-RO')}</p>
-                    <p style="font-size:14px; margin-bottom:12px;"><strong>Problemă:</strong> ${t.problem}</p>
-                    <p style="font-size:13px; color:var(--groq-color);"><i class="fa-solid fa-user-shield"></i> Rutat către: ${t.assignedTo} (${t.contact})</p>
+                    <p style="color:var(--text-muted);font-size:12px;margin-bottom:12px;"><i class="fa-regular fa-clock"></i> ${new Date(t.createdAt).toLocaleString('ro-RO')}</p>
+                    <p style="font-size:14px;margin-bottom:8px;">${t.problem}</p>
+                    <p style="font-size:13px;color:var(--groq-color);"><i class="fa-solid fa-user"></i> ${t.assignedTo} — ${t.contact}</p>
                 </div>
             `).join('');
         } catch(e) {
-            list.innerHTML = '<div style="text-align:center; color:#fca5a5; margin-top:40px;">❌ Eroare la conectarea cu serverul.</div>';
+            list.innerHTML = '<div style="text-align:center;color:#fca5a5;margin-top:40px;">❌ Eroare la încărcarea ticketelor.</div>';
         }
     }
 
@@ -251,17 +223,14 @@
         const msgInput = document.getElementById('msg');
         const msg = msgInput.value.trim();
         if (!msg) return;
-        
         addMessage(msg, 'user');
         msgInput.value = '';
         msgInput.style.height = 'auto';
-        
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message ai typing';
         typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
         document.getElementById('chat').appendChild(typingDiv);
         scrollToBottom();
-
         try {
             const res = await fetch('/chat', {
                 method: 'POST',
@@ -270,52 +239,39 @@
             });
             const data = await res.json();
             typingDiv.remove();
-            
-            if (data.error) {
-                 addMessage('❌ Eroare internă server: ' + data.error, 'ai', 'error');
-            } else {
-                 let engineType = data.engine;
-                 if (data.reply.includes('Soluție rapidă găsită')) engineType = 'knowledge-base';
-                 addMessage(data.reply, 'ai', engineType);
-            }
+            if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
+            else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
         } catch(e) {
             typingDiv.remove();
-            addMessage('❌ Nu s-a putut stabili conexiunea cu serverul AI.', 'ai', 'error');
+            addMessage('❌ Eroare de conexiune.', 'ai', 'groq');
         }
     }
 
-    function addMessage(text, type, engineType = '') {
+    function addMessage(text, type, engine) {
         const chat = document.getElementById('chat');
         const div = document.createElement('div');
         div.className = 'message ' + type;
-        
         if (type === 'ai') {
-            let tagHtml = '';
-            if (engineType === 'knowledge-base') {
-                tagHtml = `<div class="engine-tag tag-kb"><i class="fa-solid fa-bolt-lightning"></i> Cache / Bază Cunoștințe</div>`;
-            } else if (engineType === 'gemini') {
-                tagHtml = `<div class="engine-tag tag-gemini"><i class="fa-solid fa-sparkles"></i> Fallback: Gemini 1.5 Flash</div>`;
-            } else if (engineType === 'groq') {
-                tagHtml = `<div class="engine-tag tag-groq"><i class="fa-solid fa-microchip"></i> Motor: Llama 3 (Groq)</div>`;
-            }
-            div.innerHTML = tagHtml + formatText(text);
+            const tag = engine === 'knowledge-base'
+                ? `<div class="engine-tag tag-kb"><i class="fa-solid fa-book"></i> Knowledge Base</div>`
+                : `<div class="engine-tag tag-groq"><i class="fa-solid fa-bolt"></i> Groq Engine</div>`;
+            div.innerHTML = tag + formatText(text);
         } else {
             div.textContent = text;
         }
-        
         chat.appendChild(div);
         scrollToBottom();
+        return div;
     }
 
     function formatText(text) {
         if (!text) return '';
-        // Construim regex-ul dinamic pentru a nu strica parsarea Markdown
-        const codeBlockRegex = new RegExp(T3 + '([\\s\\S]*?)' + T3, 'g');
+        const cbRegex = new RegExp(T3 + '(\\w+)?\\n([\\s\\S]*?)' + T3, 'g');
         return text
-            .replace(codeBlockRegex, '<pre><code>$1</code></pre>') // Code blocks
-            .replace(/`([^`]+)`/g, '<code>$1</code>') // Inline code
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-            .replace(/\n/g, '<br>'); // Newlines
+            .replace(cbRegex, '<pre><code>$2</code></pre>')
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
     }
 
     function scrollToBottom() {
@@ -323,18 +279,55 @@
         chat.scrollTop = chat.scrollHeight;
     }
 
+    async function generateCode() {
+        const prompt = document.getElementById('code-prompt').value.trim();
+        if (!prompt) return;
+        const editor = document.getElementById('code-editor');
+        const lang = document.getElementById('code-lang').value;
+        editor.value = '// AI generează codul...';
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Scrie DOAR codul în ${lang} pentru: "${prompt}". Fără explicații, doar comentarii în cod.`, sessionId: 'code-' + sessionId })
+            });
+            const data = await res.json();
+            const match = data.reply.match(new RegExp(T3 + '(?:\\w+)?\\n([\\s\\S]*?)' + T3));
+            editor.value = match ? match[1] : data.reply;
+            document.getElementById('code-output').textContent = '// Cod generat! Apasă Rulează pentru a-l testa.';
+            codeHistory.unshift({ prompt, code: editor.value, time: new Date().toLocaleTimeString() });
+            updateHistory();
+        } catch(e) {
+            editor.value = '// Eroare la generare.';
+        }
+    }
+
+    async function analyzeCode() {
+        const code = document.getElementById('code-editor').value.trim();
+        if (!code) return;
+        const output = document.getElementById('code-output');
+        output.textContent = '⏳ AI analizează codul...';
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Analizează acest cod, găsește bug-uri și sugerează îmbunătățiri:\n\n${code}`, sessionId: 'analyze-' + sessionId })
+            });
+            const data = await res.json();
+            output.textContent = data.reply || 'Eroare';
+            codeHistory.unshift({ prompt: 'Debug AI', code: data.reply, time: new Date().toLocaleTimeString() });
+            updateHistory();
+        } catch(e) {
+            output.textContent = '❌ Eroare: ' + e.message;
+        }
+    }
+
     async function runCode() {
         const code = document.getElementById('code-editor').value.trim();
         const language = document.getElementById('code-lang').value;
+        if (!code) return;
         const output = document.getElementById('code-output');
-        
-        if (!code) {
-             output.textContent = '⚠️ Te rugăm să scrii un cod înainte de a apăsa Run.';
-             return;
-        }
-        
-        output.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Se execută în Sandbox...';
-        
+        output.textContent = '⏳ Rulez codul în sandbox...';
         try {
             const res = await fetch('/run-code', {
                 method: 'POST',
@@ -342,101 +335,38 @@
                 body: JSON.stringify({ code, language })
             });
             const data = await res.json();
-            
-            if (data.error) {
-                output.innerHTML = `<span style="color:#fca5a5;">❌ EROARE COMPILARE/RULARE:</span>\n${data.error}`;
+            if (data.error && data.error.length > 0) {
+                output.textContent = '❌ Eroare:\n' + data.error;
             } else {
-                output.innerHTML = `<span style="color:#86efac;">✅ EXECUȚIE CU SUCCES:</span>\n\n${data.output || 'Programul s-a încheiat fără output.'}`;
+                output.textContent = '✅ Output:\n\n' + (data.output || 'Fără output.');
             }
         } catch(e) {
-            output.textContent = '❌ Eroare de rețea la contactarea Piston API.';
+            output.textContent = '❌ Eroare: ' + e.message;
         }
     }
 
-    async function generateCode() {
-        const prompt = document.getElementById('code-prompt').value.trim();
-        if (!prompt) return;
-        
-        const editor = document.getElementById('code-editor');
-        const lang = document.getElementById('code-lang').value;
-        editor.value = '// AI-ul generează codul. Te rog așteaptă...';
-        
-        try {
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: `Scrie DOAR codul sursă în limbajul ${lang} pentru următoarea cerință: "${prompt}". Nu adăuga explicații text, doar comentarii în interiorul codului. Folosește formatul Markdown pentru cod.`, 
-                    sessionId: 'code-gen-' + sessionId 
-                })
-            });
-            const data = await res.json();
-            
-            let rawCode = data.reply;
-            
-            // Regex inteligent și sigur
-            const extractRegex = new RegExp(T3 + '(?:\\w+)?\\n([\\s\\S]*?)' + T3);
-            const codeMatch = rawCode.match(extractRegex);
-            
-            if(codeMatch) {
-                editor.value = codeMatch[1];
-            } else {
-                editor.value = rawCode; // Fallback
-            }
-            
-            document.getElementById('code-output').textContent = `// Cod generat cu succes folosind motorul: ${data.engine}`;
-        } catch(e) {
-            editor.value = '// Eroare la generarea codului.';
-        }
+    function updateHistory() {
+        const hist = document.getElementById('code-history');
+        hist.innerHTML = codeHistory.slice(0, 5).map((h, i) => `
+            <span onclick="loadHistory(${i})" style="background:var(--bg-surface-hover);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text-muted);">
+                ${h.time} — ${h.prompt.substring(0, 15)}...
+            </span>
+        `).join('');
     }
 
-    async function analyzeCode() {
-        const code = document.getElementById('code-editor').value.trim();
-        if (!code) return;
-        
-        const output = document.getElementById('code-output');
-        output.innerHTML = '<i class="fa-solid fa-magnifying-glass fa-beat"></i> AI analizează codul...';
-        
-        try {
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: `Fii un reviewer de cod strict. Analizează următorul cod, identifică potențiale bug-uri, probleme de securitate sau optimizări și explică-le pe scurt:\n\n${T3}\n${code}\n${T3}`, 
-                    sessionId: 'analyze-' + sessionId 
-                })
-            });
-            const data = await res.json();
-            
-            output.innerHTML = `<span style="color:#93c5fd;"><i class="fa-solid fa-robot"></i> Analiză AI (Motor: ${data.engine}):</span>\n\n${formatTextForTerminal(data.reply)}`;
-        } catch(e) {
-            output.textContent = '❌ Eroare la analiza codului.';
-        }
-    }
-    
-    function formatTextForTerminal(text) {
-         const codeBlockRegex = new RegExp(T3 + '([\\s\\S]*?)' + T3, 'g');
-         return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(codeBlockRegex, '\n$1\n');
+    function loadHistory(i) {
+        document.getElementById('code-output').textContent = codeHistory[i].code;
     }
 
     function copyOutput() {
-        const text = document.getElementById('code-output').innerText;
-        navigator.clipboard.writeText(text);
-        
-        const btn = document.querySelector('#code-view .pane-header button');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiat';
-        setTimeout(() => btn.innerHTML = originalText, 2000);
+        navigator.clipboard.writeText(document.getElementById('code-output').innerText);
+        alert('✅ Copiat!');
     }
 
-    // Auto-resize pentru textarea din chat
-    const msgArea = document.getElementById("msg");
-    msgArea.addEventListener("input", function() {
-        this.style.height = "auto";
-        this.style.height = (this.scrollHeight) + "px";
+    document.getElementById('msg').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
     });
 </script>
 </body>
 </html>
-
-
