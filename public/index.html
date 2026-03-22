@@ -296,14 +296,22 @@
         renderChatList();
         renderChat();
         document.getElementById('msg').focus();
+        if (window.innerWidth <= 768) {
+    sidebarOpen = false;
+    document.getElementById('sidebar').classList.remove('open');
+        }
     }
 
     function loadChat(id) {
-        currentChatId = id;
-        renderChatList();
-        renderChat();
+    currentChatId = id;
+    renderChatList();
+    renderChat();
+    // Închide sidebar pe mobile
+    if (window.innerWidth <= 768) {
+        sidebarOpen = false;
+        document.getElementById('sidebar').classList.remove('open');
     }
-
+    }
     function deleteChat(e, id) {
         e.stopPropagation();
         delete allChats[id];
