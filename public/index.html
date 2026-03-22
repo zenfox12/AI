@@ -410,34 +410,6 @@ async function retryMessage(index) {
         document.getElementById(tabId + '-view').classList.add('active');
         if (tabId === 'tickets') loadTickets();
     }
-
-    // ===== TICKETS =====
-    async function loadTickets() {
-        const list = document.getElementById('tickets-list');
-        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);margin-top:40px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Încărcare...</div>';
-        try {
-            const res = await fetch('/tickets');
-            const tickets = await res.json();
-            if (tickets.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-muted);margin-top:40px;"><i class="fa-solid fa-check-circle" style="font-size:32px;color:#4ade80;display:block;margin-bottom:12px;"></i>Nu există tickete deschise!</div>';
-                return;
-            }
-            list.innerHTML = tickets.map(t => `
-                <div class="ticket-item">
-                    <div class="header-row">
-                        <span class="tid"><i class="fa-solid fa-hashtag"></i> ${t.id}</span>
-                        <span class="status"><i class="fa-solid fa-fire"></i> Deschis</span>
-                    </div>
-                    <p style="color:var(--text-muted);font-size:12px;margin-bottom:12px;"><i class="fa-regular fa-clock"></i> ${new Date(t.createdAt).toLocaleString('ro-RO')}</p>
-                    <p style="font-size:14px;margin-bottom:8px;">${t.problem}</p>
-                    <p style="font-size:13px;color:var(--groq-color);"><i class="fa-solid fa-user"></i> ${t.assignedTo} — ${t.contact}</p>
-                </div>
-            `).join('');
-        } catch(e) {
-            list.innerHTML = '<div style="text-align:center;color:#fca5a5;margin-top:40px;">❌ Eroare la încărcarea ticketelor.</div>';
-        }
-    }
-
     // ===== SEND MESSAGE =====
     async function send() {
         const msgInput = document.getElementById('msg');
