@@ -515,16 +515,6 @@ async function retryMessage(index) {
     }
     return div;
 }
-        // Salvează în istoricul conversației
-        if (currentChatId && allChats[currentChatId]) {
-            allChats[currentChatId].messages.push({ type, html });
-            allChats[currentChatId].updatedAt = Date.now();
-            saveAllChats();
-            renderChatList();
-        }
-        return div;
-    }
-
     function escapeHtml(text) {
         return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
