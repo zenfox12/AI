@@ -127,6 +127,7 @@
             <div id="input-area">
                 <div class="input-wrapper">
                     <textarea id="msg" placeholder="Descrie problema ta tehnică..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                    <button class="send-btn" onclick="clearHistory()" style="background:var(--bg-surface-hover); margin-right:4px;" title="Șterge istoricul"><i class="fa-solid fa-trash"></i></button>
                     <button class="send-btn" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -237,10 +238,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: msg, sessionId })
             });
-            const data = await res.json();
-            typingDiv.remove();
-            if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
-            else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
+           const data = await res.json();
+typingDiv.remove();
+if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
+else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
+saveChatHistory();
         } catch(e) {
             typingDiv.remove();
             addMessage('❌ Eroare de conexiune.', 'ai', 'groq');
@@ -367,6 +369,58 @@
         this.style.height = 'auto';
         this.style.height = this.scrollHeight + 'px';
     });
+    // Salvare și încărcare istoric chat
+function saveChatHistory() {
+    const messages = [];
+    document.querySelectorAll('#chat .message').forEach(msg => {
+        messages.push({
+            type: msg.classList.contains('user') ? 'user' : 'ai',
+            html: msg.innerHTML
+        });
+    });
+    localStorage.setItem('firebot_history', JSON.stringify(messages));
+}
+
+function loadChatHistory() {
+    try {
+        const saved = localStorage.getItem('firebot_history');
+        if (!saved) return;
+        const messages = JSON.parse(saved);
+        const chat = document.getElementById('chat');
+        // Păstrăm mesajul de bun venit
+        const welcome = chat.firstElementChild;
+        chat.innerHTML = '';
+        chat.appendChild(welcome);
+        messages.forEach(m => {
+            if (m.type === 'user') {
+                const div = document.createElement('div');
+                div.className = 'message user';
+                div.innerHTML = m.html;
+                chat.appendChild(div);
+            } else {
+                const div = document.createElement('div');
+                div.className = 'message ai';
+                div.innerHTML = m.html;
+                chat.appendChild(div);
+            }
+        });
+        scrollToBottom();
+    } catch(e) {}
+}
+
+function clearHistory() {
+    localStorage.removeItem('firebot_history');
+    const chat = document.getElementById('chat');
+    chat.innerHTML = `
+        <div class="message ai">
+            <div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
+            Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
+            Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
+        </div>`;
+}
+
+// Încarcă istoricul la pornire
+loadChatHistory();
 </script>
 </body>
 </html>
