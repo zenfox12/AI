@@ -17,26 +17,55 @@
             --text-muted: #94a3b8;
             --border: rgba(255, 255, 255, 0.08);
             --groq-color: #60a5fa;
-            --gemini-color: #a78bfa;
             --kb-color: #fb923c;
+            --sidebar-width: 260px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; overflow: hidden; }
-        .app-container { display: flex; flex-direction: column; width: 100%; max-width: 1400px; margin: 0 auto; height: 100%; }
-        header { background: var(--bg-surface); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        header h1 { font-size: 20px; font-weight: 600; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        
+        .app-wrapper { display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-width); background: #0a1020; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; transition: transform 0.3s ease; z-index: 100; }
+        .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+        .new-chat-btn { width: 100%; background: var(--primary); color: white; border: none; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; transition: background 0.2s; }
+        .new-chat-btn:hover { background: var(--primary-hover); }
+        .sidebar-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px 6px; }
+        .chat-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+        .chat-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background 0.2s; margin-bottom: 2px; }
+        .chat-item:hover { background: var(--bg-surface-hover); }
+        .chat-item.active { background: var(--bg-surface); }
+        .chat-item-title { font-size: 13px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+        .chat-item-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+        .chat-item-delete { color: var(--text-muted); font-size: 12px; opacity: 0; transition: opacity 0.2s; padding: 2px 4px; border-radius: 4px; }
+        .chat-item:hover .chat-item-delete { opacity: 1; }
+        .chat-item-delete:hover { color: #fca5a5; background: rgba(239,68,68,0.1); }
+        .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); text-align: center; }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+        .app-container { display: flex; flex-direction: column; height: 100%; }
+        
+        header { background: var(--bg-surface); padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .sidebar-toggle { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; border-radius: 6px; transition: color 0.2s; width: auto; height: auto; border-radius: 6px; }
+        .sidebar-toggle:hover { color: var(--text-main); background: var(--bg-surface-hover); }
+        header h1 { font-size: 18px; font-weight: 600; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .badge.groq { background: rgba(59,130,246,0.15); color: var(--groq-color); border: 1px solid rgba(59,130,246,0.3); }
         .badge.kb { background: rgba(249,115,22,0.15); color: var(--kb-color); border: 1px solid rgba(249,115,22,0.3); }
-        .tabs { display: flex; background: var(--bg-main); padding: 12px 24px 0; gap: 8px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+
+        .tabs { display: flex; background: var(--bg-main); padding: 10px 24px 0; gap: 8px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
-        .tab { padding: 10px 16px; cursor: pointer; color: var(--text-muted); font-weight: 500; font-size: 14px; border-radius: 12px 12px 0 0; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .tab { padding: 8px 16px; cursor: pointer; color: var(--text-muted); font-weight: 500; font-size: 14px; border-radius: 12px 12px 0 0; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .tab:hover { color: var(--text-main); }
         .tab.active { background: var(--bg-surface); color: var(--primary); border-bottom: 2px solid var(--primary); }
+
         .views-container { flex: 1; position: relative; overflow: hidden; background: var(--bg-surface); border-radius: 0 0 16px 16px; }
         .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; overflow: hidden; }
         .view.active { display: flex; }
+
         #chat { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
         .message { max-width: 85%; padding: 14px 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease-out; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); word-wrap: break-word; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -47,6 +76,7 @@
         .tag-kb { background: rgba(249,115,22,0.2); color: var(--kb-color); }
         pre { background: #0d1117; padding: 12px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 13px; border: 1px solid var(--border); }
         code { font-family: 'Courier New', monospace; color: #79c0ff; }
+
         #input-area { background: var(--bg-surface); padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0; }
         .input-wrapper { display: flex; gap: 10px; align-items: flex-end; background: var(--bg-main); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; transition: border-color 0.2s; }
         .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
@@ -54,12 +84,14 @@
         #msg:focus { outline: none; }
         .send-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
         .send-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+
         #tickets-content { padding: 24px; overflow-y: auto; flex: 1; }
         .ticket-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; transition: transform 0.2s; }
         .ticket-item:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         .ticket-item .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .ticket-item .tid { color: var(--gemini-color); font-weight: bold; font-family: monospace; font-size: 14px; }
+        .ticket-item .tid { color: #a78bfa; font-weight: bold; font-family: monospace; font-size: 14px; }
         .ticket-item .status { display: inline-block; background: rgba(239,68,68,0.15); color: #fca5a5; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; border: 1px solid rgba(239,68,68,0.3); }
+
         .code-toolbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .code-input { flex: 1; min-width: 200px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; }
         .code-input:focus { border-color: var(--primary); }
@@ -77,16 +109,21 @@
         .lang-select { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; cursor: pointer; }
         #code-editor { flex: 1; background: #0d1117; color: #e6edf3; border: none; padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; resize: none; outline: none; line-height: 1.5; }
         #code-output { flex: 1; background: #0a0c10; padding: 16px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; color: #e6edf3; white-space: pre-wrap; }
+        #code-history { max-height: 44px; overflow-x: auto; border-top: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+
         .typing { display: flex; gap: 4px; padding: 10px; }
         .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.4s infinite both; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
-        #code-history { max-height: 44px; overflow-x: auto; border-top: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; }
+        .empty-state i { font-size: 48px; opacity: 0.3; }
+
         @media (max-width: 768px) {
-            header { padding: 12px 16px; flex-direction: column; gap: 10px; align-items: flex-start; }
-            .badges { justify-content: flex-start; }
-            .tabs { padding: 10px 16px 0; }
+            .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            header { padding: 12px 16px; }
             #chat { padding: 16px; }
             .message { max-width: 90%; font-size: 13px; }
             #input-area { padding: 12px 16px; }
@@ -99,82 +136,97 @@
     </style>
 </head>
 <body>
-<div class="app-container">
-    <header>
-        <h1><i class="fa-solid fa-fire" style="-webkit-text-fill-color:#f97316;"></i> FireBot AI</h1>
-        <div class="badges">
-            <span class="badge groq"><i class="fa-solid fa-bolt"></i> Groq</span>
-            <span class="badge kb"><i class="fa-solid fa-book"></i> KB</span>
+<div class="app-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="newChat()">
+                <i class="fa-solid fa-plus"></i> Chat Nou
+            </button>
         </div>
-    </header>
-
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Chat</div>
-        <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete</div>
-        <div class="tab" onclick="showTab('code', event)"><i class="fa-solid fa-laptop-code"></i> Sandbox Cod</div>
+        <div class="sidebar-title">Conversații recente</div>
+        <div class="chat-list" id="chat-list"></div>
+        <div class="sidebar-footer">FireBot AI • v1.0</div>
     </div>
 
-    <div class="views-container">
-        <!-- CHAT -->
-        <div id="chat-view" class="view active">
-            <div id="chat">
-                <div class="message ai">
-                    <div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
-                    Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
-                    Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
+    <!-- MAIN -->
+    <div class="main-content">
+        <div class="app-container">
+            <header>
+                <div class="header-left">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1><i class="fa-solid fa-fire" style="-webkit-text-fill-color:#f97316;"></i> FireBot AI</h1>
                 </div>
-            </div>
-            <div id="input-area">
-                <div class="input-wrapper">
-                    <textarea id="msg" placeholder="Descrie problema ta tehnică..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-                    <button class="send-btn" onclick="clearHistory()" style="background:var(--bg-surface-hover); margin-right:4px;" title="Șterge istoricul"><i class="fa-solid fa-trash"></i></button>
-                    <button class="send-btn" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
+                <div class="badges">
+                    <span class="badge groq"><i class="fa-solid fa-bolt"></i> Groq</span>
+                    <span class="badge kb"><i class="fa-solid fa-book"></i> KB</span>
                 </div>
-            </div>
-        </div>
+            </header>
 
-        <!-- TICKETE -->
-        <div id="tickets-view" class="view">
-            <div id="tickets-content">
-                <h2 style="margin-bottom:20px; color:#a78bfa; font-size:18px;"><i class="fa-solid fa-layer-group"></i> Tickete Active</h2>
-                <div id="tickets-list"></div>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('chat', event)"><i class="fa-solid fa-comments"></i> Chat</div>
+                <div class="tab" onclick="showTab('tickets', event)"><i class="fa-solid fa-ticket"></i> Tickete</div>
+                <div class="tab" onclick="showTab('code', event)"><i class="fa-solid fa-laptop-code"></i> Sandbox Cod</div>
             </div>
-        </div>
 
-        <!-- COD -->
-        <div id="code-view" class="view">
-            <div class="code-toolbar">
-                <input id="code-prompt" class="code-input" type="text" placeholder="Ex: Scrie o funcție Python care sortează o listă..." onkeydown="if(event.key==='Enter') generateCode()">
-                <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează</button>
-            </div>
-            <div class="editor-split">
-                <div class="editor-pane left">
-                    <div class="pane-header">
-                        <span><i class="fa-solid fa-pen"></i> Editor</span>
-                        <div class="pane-controls">
-                            <select id="code-lang" class="lang-select">
-                                <option value="python">🐍 Python</option>
-                                <option value="javascript">🟨 JavaScript</option>
-                                <option value="java">☕ Java</option>
-                                <option value="cpp">⚙️ C++</option>
-                                <option value="csharp">💜 C#</option>
-                                <option value="php">🐘 PHP</option>
-                                <option value="typescript">🔷 TypeScript</option>
-                                <option value="rust">🦀 Rust</option>
-                            </select>
-                            <button class="code-btn secondary" onclick="analyzeCode()"><i class="fa-solid fa-bug"></i> Debug AI</button>
-                            <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Rulează</button>
+            <div class="views-container">
+                <!-- CHAT -->
+                <div id="chat-view" class="view active">
+                    <div id="chat"></div>
+                    <div id="input-area">
+                        <div class="input-wrapper">
+                            <textarea id="msg" placeholder="Descrie problema ta tehnică..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+                            <button class="send-btn" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
                         </div>
                     </div>
-                    <textarea id="code-editor" placeholder="// Lipește sau scrie codul tău aici..."></textarea>
                 </div>
-                <div class="editor-pane">
-                    <div class="pane-header">
-                        <span><i class="fa-solid fa-terminal"></i> Output</span>
-                        <button class="code-btn secondary" onclick="copyOutput()"><i class="fa-regular fa-copy"></i> Copiază</button>
+
+                <!-- TICKETE -->
+                <div id="tickets-view" class="view">
+                    <div id="tickets-content">
+                        <h2 style="margin-bottom:20px; color:#a78bfa; font-size:18px;"><i class="fa-solid fa-layer-group"></i> Tickete Active</h2>
+                        <div id="tickets-list"></div>
                     </div>
-                    <div id="code-output">// Outputul va apărea aici...</div>
-                    <div id="code-history"></div>
+                </div>
+
+                <!-- COD -->
+                <div id="code-view" class="view">
+                    <div class="code-toolbar">
+                        <input id="code-prompt" class="code-input" type="text" placeholder="Ex: Scrie o funcție Python care sortează o listă..." onkeydown="if(event.key==='Enter') generateCode()">
+                        <button class="code-btn" onclick="generateCode()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generează</button>
+                    </div>
+                    <div class="editor-split">
+                        <div class="editor-pane left">
+                            <div class="pane-header">
+                                <span><i class="fa-solid fa-pen"></i> Editor</span>
+                                <div class="pane-controls">
+                                    <select id="code-lang" class="lang-select">
+                                        <option value="python">🐍 Python</option>
+                                        <option value="javascript">🟨 JavaScript</option>
+                                        <option value="java">☕ Java</option>
+                                        <option value="cpp">⚙️ C++</option>
+                                        <option value="csharp">💜 C#</option>
+                                        <option value="php">🐘 PHP</option>
+                                        <option value="typescript">🔷 TypeScript</option>
+                                        <option value="rust">🦀 Rust</option>
+                                    </select>
+                                    <button class="code-btn secondary" onclick="analyzeCode()"><i class="fa-solid fa-bug"></i> Debug AI</button>
+                                    <button class="code-btn green" onclick="runCode()"><i class="fa-solid fa-play"></i> Rulează</button>
+                                </div>
+                            </div>
+                            <textarea id="code-editor" placeholder="// Lipește sau scrie codul tău aici..."></textarea>
+                        </div>
+                        <div class="editor-pane">
+                            <div class="pane-header">
+                                <span><i class="fa-solid fa-terminal"></i> Output</span>
+                                <button class="code-btn secondary" onclick="copyOutput()"><i class="fa-regular fa-copy"></i> Copiază</button>
+                            </div>
+                            <div id="code-output">// Outputul va apărea aici...</div>
+                            <div id="code-history"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,10 +234,107 @@
 </div>
 
 <script>
-    const sessionId = Math.random().toString(36).substr(2, 9);
-    const codeHistory = [];
     const T3 = '`'.repeat(3);
+    let currentChatId = null;
+    let allChats = {};
+    let sidebarOpen = true;
 
+    // ===== SIDEBAR =====
+    function toggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('open', sidebarOpen);
+        } else {
+            sidebar.style.display = sidebarOpen ? 'flex' : 'none';
+        }
+    }
+
+    // ===== CHAT MANAGEMENT =====
+    function loadAllChats() {
+        try {
+            allChats = JSON.parse(localStorage.getItem('firebot_all_chats') || '{}');
+        } catch(e) { allChats = {}; }
+        renderChatList();
+    }
+
+    function saveAllChats() {
+        localStorage.setItem('firebot_all_chats', JSON.stringify(allChats));
+    }
+
+    function renderChatList() {
+        const list = document.getElementById('chat-list');
+        const ids = Object.keys(allChats).sort((a, b) => allChats[b].updatedAt - allChats[a].updatedAt);
+        
+        if (ids.length === 0) {
+            list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">Nicio conversație încă</div>';
+            return;
+        }
+
+        list.innerHTML = ids.map(id => `
+            <div class="chat-item ${id === currentChatId ? 'active' : ''}" onclick="loadChat('${id}')">
+                <span class="chat-item-title">${allChats[id].title}</span>
+                <span class="chat-item-delete" onclick="deleteChat(event, '${id}')"><i class="fa-solid fa-trash"></i></span>
+            </div>
+        `).join('');
+    }
+
+    function newChat() {
+        currentChatId = 'chat_' + Date.now();
+        allChats[currentChatId] = {
+            title: 'Chat nou',
+            messages: [],
+            updatedAt: Date.now()
+        };
+        saveAllChats();
+        renderChatList();
+        renderChat();
+        document.getElementById('msg').focus();
+    }
+
+    function loadChat(id) {
+        currentChatId = id;
+        renderChatList();
+        renderChat();
+    }
+
+    function deleteChat(e, id) {
+        e.stopPropagation();
+        delete allChats[id];
+        saveAllChats();
+        if (currentChatId === id) {
+            const ids = Object.keys(allChats);
+            if (ids.length > 0) loadChat(ids[0]);
+            else newChat();
+        } else {
+            renderChatList();
+        }
+    }
+
+    function renderChat() {
+        const chat = document.getElementById('chat');
+        chat.innerHTML = '';
+
+        // Mesaj bun venit
+        const welcome = document.createElement('div');
+        welcome.className = 'message ai';
+        welcome.innerHTML = `<div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
+            Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
+            Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.`;
+        chat.appendChild(welcome);
+
+        if (!currentChatId || !allChats[currentChatId]) return;
+
+        allChats[currentChatId].messages.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'message ' + m.type;
+            div.innerHTML = m.html;
+            chat.appendChild(div);
+        });
+        scrollToBottom();
+    }
+
+    // ===== TABS =====
     function showTab(tabId, e) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         e.currentTarget.classList.add('active');
@@ -194,6 +343,7 @@
         if (tabId === 'tickets') loadTickets();
     }
 
+    // ===== TICKETS =====
     async function loadTickets() {
         const list = document.getElementById('tickets-list');
         list.innerHTML = '<div style="text-align:center;color:var(--text-muted);margin-top:40px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Încărcare...</div>';
@@ -220,29 +370,39 @@
         }
     }
 
+    // ===== SEND MESSAGE =====
     async function send() {
         const msgInput = document.getElementById('msg');
         const msg = msgInput.value.trim();
         if (!msg) return;
+
+        if (!currentChatId) newChat();
+
+        // Actualizează titlul cu primul mesaj
+        if (allChats[currentChatId].messages.length === 0) {
+            allChats[currentChatId].title = msg.substring(0, 30) + (msg.length > 30 ? '...' : '');
+        }
+
         addMessage(msg, 'user');
         msgInput.value = '';
         msgInput.style.height = 'auto';
+
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message ai typing';
         typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
         document.getElementById('chat').appendChild(typingDiv);
         scrollToBottom();
+
         try {
             const res = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg, sessionId })
+                body: JSON.stringify({ message: msg, sessionId: currentChatId })
             });
-           const data = await res.json();
-typingDiv.remove();
-if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
-else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
-saveChatHistory();
+            const data = await res.json();
+            typingDiv.remove();
+            if (data.error) addMessage('❌ Eroare: ' + data.error, 'ai', 'groq');
+            else addMessage(data.reply || 'Fără răspuns', 'ai', data.engine);
         } catch(e) {
             typingDiv.remove();
             addMessage('❌ Eroare de conexiune.', 'ai', 'groq');
@@ -253,17 +413,32 @@ saveChatHistory();
         const chat = document.getElementById('chat');
         const div = document.createElement('div');
         div.className = 'message ' + type;
+
+        let html = '';
         if (type === 'ai') {
             const tag = engine === 'knowledge-base'
                 ? `<div class="engine-tag tag-kb"><i class="fa-solid fa-book"></i> Knowledge Base</div>`
                 : `<div class="engine-tag tag-groq"><i class="fa-solid fa-bolt"></i> Groq Engine</div>`;
-            div.innerHTML = tag + formatText(text);
+            html = tag + formatText(text);
         } else {
-            div.textContent = text;
+            html = escapeHtml(text);
         }
+        div.innerHTML = html;
         chat.appendChild(div);
         scrollToBottom();
+
+        // Salvează în istoricul conversației
+        if (currentChatId && allChats[currentChatId]) {
+            allChats[currentChatId].messages.push({ type, html });
+            allChats[currentChatId].updatedAt = Date.now();
+            saveAllChats();
+            renderChatList();
+        }
         return div;
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
     function formatText(text) {
@@ -281,6 +456,9 @@ saveChatHistory();
         chat.scrollTop = chat.scrollHeight;
     }
 
+    // ===== CODE =====
+    const codeHistory = [];
+
     async function generateCode() {
         const prompt = document.getElementById('code-prompt').value.trim();
         if (!prompt) return;
@@ -291,7 +469,7 @@ saveChatHistory();
             const res = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `Scrie DOAR codul în ${lang} pentru: "${prompt}". Fără explicații, doar comentarii în cod.`, sessionId: 'code-' + sessionId })
+                body: JSON.stringify({ message: `Scrie DOAR codul în ${lang} pentru: "${prompt}". Fără explicații, doar comentarii în cod.`, sessionId: 'code-gen' })
             });
             const data = await res.json();
             const match = data.reply.match(new RegExp(T3 + '(?:\\w+)?\\n([\\s\\S]*?)' + T3));
@@ -299,9 +477,7 @@ saveChatHistory();
             document.getElementById('code-output').textContent = '// Cod generat! Apasă Rulează pentru a-l testa.';
             codeHistory.unshift({ prompt, code: editor.value, time: new Date().toLocaleTimeString() });
             updateHistory();
-        } catch(e) {
-            editor.value = '// Eroare la generare.';
-        }
+        } catch(e) { editor.value = '// Eroare la generare.'; }
     }
 
     async function analyzeCode() {
@@ -313,15 +489,13 @@ saveChatHistory();
             const res = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `Analizează acest cod, găsește bug-uri și sugerează îmbunătățiri:\n\n${code}`, sessionId: 'analyze-' + sessionId })
+                body: JSON.stringify({ message: `Analizează acest cod, găsește bug-uri și sugerează îmbunătățiri:\n\n${code}`, sessionId: 'analyze' })
             });
             const data = await res.json();
             output.textContent = data.reply || 'Eroare';
             codeHistory.unshift({ prompt: 'Debug AI', code: data.reply, time: new Date().toLocaleTimeString() });
             updateHistory();
-        } catch(e) {
-            output.textContent = '❌ Eroare: ' + e.message;
-        }
+        } catch(e) { output.textContent = '❌ Eroare: ' + e.message; }
     }
 
     async function runCode() {
@@ -337,14 +511,8 @@ saveChatHistory();
                 body: JSON.stringify({ code, language })
             });
             const data = await res.json();
-            if (data.error && data.error.length > 0) {
-                output.textContent = '❌ Eroare:\n' + data.error;
-            } else {
-                output.textContent = '✅ Output:\n\n' + (data.output || 'Fără output.');
-            }
-        } catch(e) {
-            output.textContent = '❌ Eroare: ' + e.message;
-        }
+            output.textContent = data.error?.length > 0 ? '❌ Eroare:\n' + data.error : '✅ Output:\n\n' + (data.output || 'Fără output.');
+        } catch(e) { output.textContent = '❌ Eroare: ' + e.message; }
     }
 
     function updateHistory() {
@@ -369,58 +537,10 @@ saveChatHistory();
         this.style.height = 'auto';
         this.style.height = this.scrollHeight + 'px';
     });
-    // Salvare și încărcare istoric chat
-function saveChatHistory() {
-    const messages = [];
-    document.querySelectorAll('#chat .message').forEach(msg => {
-        messages.push({
-            type: msg.classList.contains('user') ? 'user' : 'ai',
-            html: msg.innerHTML
-        });
-    });
-    localStorage.setItem('firebot_history', JSON.stringify(messages));
-}
 
-function loadChatHistory() {
-    try {
-        const saved = localStorage.getItem('firebot_history');
-        if (!saved) return;
-        const messages = JSON.parse(saved);
-        const chat = document.getElementById('chat');
-        // Păstrăm mesajul de bun venit
-        const welcome = chat.firstElementChild;
-        chat.innerHTML = '';
-        chat.appendChild(welcome);
-        messages.forEach(m => {
-            if (m.type === 'user') {
-                const div = document.createElement('div');
-                div.className = 'message user';
-                div.innerHTML = m.html;
-                chat.appendChild(div);
-            } else {
-                const div = document.createElement('div');
-                div.className = 'message ai';
-                div.innerHTML = m.html;
-                chat.appendChild(div);
-            }
-        });
-        scrollToBottom();
-    } catch(e) {}
-}
-
-function clearHistory() {
-    localStorage.removeItem('firebot_history');
-    const chat = document.getElementById('chat');
-    chat.innerHTML = `
-        <div class="message ai">
-            <div class="engine-tag tag-groq"><i class="fa-solid fa-fire"></i> FireBot Agent</div>
-            Salut! Sunt FireBot, agentul tău de suport tehnic. Descrie problema ta și o voi rezolva pas cu pas.<br><br>
-            Dacă problema e complexă, voi crea automat un <strong>ticket</strong> pentru un specialist uman.
-        </div>`;
-}
-
-// Încarcă istoricul la pornire
-loadChatHistory();
+    // ===== INIT =====
+    loadAllChats();
+    newChat();
 </script>
 </body>
 </html>
