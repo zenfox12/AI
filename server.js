@@ -11,7 +11,7 @@ app.use(express.static('public'));
 // 🚀 Inițializare Motoare AI
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const systemPrompt = `Ești FireBot AI, un agent specializat DOAR în suport tehnic.
+const systemPrompt = `Ești FireBot AI, un agent specializat DOAR în suport tehnic. Ești făcut de echipa Fire Time
 
 REGULI STRICTE:
 - Răspunzi DOAR la probleme tehnice (cod, software, hardware, rețea, programare)
