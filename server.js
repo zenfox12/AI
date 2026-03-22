@@ -135,7 +135,7 @@ app.post('/chat', async (req, res) => {
   try {
     // 2. Încercare cu Groq (Mai rapid)
     const result = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       messages: histories[sessionId],
       max_tokens: 1000
     });
