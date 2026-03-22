@@ -20,6 +20,12 @@
             --kb-color: #fb923c;
             --sidebar-width: 260px;
         }
+        .message-actions { display: none; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+        .message:hover .message-actions { display: flex; }
+        .action-btn { background: var(--bg-surface-hover); border: none; color: var(--text-muted); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .action-btn:hover { color: var(--text-main); background: var(--border); }
+        .action-btn.danger:hover { color: #fca5a5; background: rgba(239,68,68,0.1); }
+        .message-edit { width: 100%; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--primary); border-radius: 8px; padding: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: none; outline: none; margin-top: 8px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; overflow: hidden; }
         
@@ -334,6 +340,70 @@
         scrollToBottom();
     }
 
+    function deleteMessage(index) {
+    if (!currentChatId || !allChats[currentChatId]) return;
+    allChats[currentChatId].messages.splice(index, 1);
+    saveAllChats();
+    renderChat();
+}
+
+function editMessage(btn, index) {
+    const msgDiv = btn.closest('.message');
+    const currentText = allChats[currentChatId]?.messages[index]?.text || '';
+    
+    const textarea = document.createElement('textarea');
+    textarea.className = 'message-edit';
+    textarea.value = currentText;
+    textarea.rows = 3;
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'action-btn';
+    saveBtn.style.marginTop = '6px';
+    saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Salvează & Retrimite';
+    saveBtn.onclick = async () => {
+        const newText = textarea.value.trim();
+        if (!newText) return;
+        
+        // Șterge mesajele de la index în jos
+        allChats[currentChatId].messages.splice(index);
+        saveAllChats();
+        renderChat();
+        
+        // Retrimite mesajul editat
+        document.getElementById('msg').value = newText;
+        await send();
+    };
+    
+    msgDiv.innerHTML = '';
+    msgDiv.appendChild(textarea);
+    msgDiv.appendChild(saveBtn);
+    textarea.focus();
+}
+
+async function retryMessage(index) {
+    if (!currentChatId || !allChats[currentChatId]) return;
+    
+    // Găsește ultimul mesaj user înainte de index
+    let userMsg = '';
+    for (let i = index - 1; i >= 0; i--) {
+        if (allChats[currentChatId].messages[i]?.type === 'user') {
+            userMsg = allChats[currentChatId].messages[i]?.text || '';
+            break;
+        }
+    }
+    
+    if (!userMsg) return;
+    
+    // Șterge răspunsul AI de la index
+    allChats[currentChatId].messages.splice(index);
+    saveAllChats();
+    renderChat();
+    
+    // Retrimite
+    document.getElementById('msg').value = userMsg;
+    await send();
+}
+
     // ===== TABS =====
     function showTab(tabId, e) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -409,24 +479,42 @@
         }
     }
 
-    function addMessage(text, type, engine) {
-        const chat = document.getElementById('chat');
-        const div = document.createElement('div');
-        div.className = 'message ' + type;
+   function addMessage(text, type, engine, index) {
+    const chat = document.getElementById('chat');
+    const div = document.createElement('div');
+    const msgIndex = index !== undefined ? index : (allChats[currentChatId]?.messages.length || 0);
+    div.className = 'message ' + type;
+    div.dataset.index = msgIndex;
 
-        let html = '';
-        if (type === 'ai') {
-            const tag = engine === 'knowledge-base'
-                ? `<div class="engine-tag tag-kb"><i class="fa-solid fa-book"></i> Knowledge Base</div>`
-                : `<div class="engine-tag tag-groq"><i class="fa-solid fa-bolt"></i> Groq Engine</div>`;
-            html = tag + formatText(text);
-        } else {
-            html = escapeHtml(text);
-        }
-        div.innerHTML = html;
-        chat.appendChild(div);
-        scrollToBottom();
+    let html = '';
+    if (type === 'ai') {
+        const tag = engine === 'knowledge-base'
+            ? `<div class="engine-tag tag-kb"><i class="fa-solid fa-book"></i> Knowledge Base</div>`
+            : `<div class="engine-tag tag-groq"><i class="fa-solid fa-bolt"></i> Groq Engine</div>`;
+        html = tag + formatText(text);
+        html += `<div class="message-actions">
+            <button class="action-btn" onclick="retryMessage(${msgIndex})"><i class="fa-solid fa-rotate-right"></i> Retrimite</button>
+            <button class="action-btn danger" onclick="deleteMessage(${msgIndex})"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+    } else {
+        html = escapeHtml(text);
+        html += `<div class="message-actions">
+            <button class="action-btn" onclick="editMessage(this, ${msgIndex})"><i class="fa-solid fa-pencil"></i></button>
+            <button class="action-btn danger" onclick="deleteMessage(${msgIndex})"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+    }
+    div.innerHTML = html;
+    chat.appendChild(div);
+    scrollToBottom();
 
+    if (currentChatId && allChats[currentChatId] && index === undefined) {
+        allChats[currentChatId].messages.push({ type, html: div.innerHTML, text });
+        allChats[currentChatId].updatedAt = Date.now();
+        saveAllChats();
+        renderChatList();
+    }
+    return div;
+}
         // Salvează în istoricul conversației
         if (currentChatId && allChats[currentChatId]) {
             allChats[currentChatId].messages.push({ type, html });
